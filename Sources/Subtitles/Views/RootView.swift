@@ -1,4 +1,5 @@
 import AVKit
+import NaturalLanguage
 import SwiftUI
 import Translation
 
@@ -234,10 +235,16 @@ struct TranslationHost: View {
     @State private var config: TranslationSession.Configuration? = nil
 
     var body: some View {
-        Color.clear.frame(width: 0, height: 0)
+        Color.clear.frame(width: 1, height: 1).opacity(0.01)
             .onChange(of: model.translationRequest) { _, _ in
                 guard let target = model.targetLanguage else { return }
-                if config?.target == target { config?.invalidate() } else { config = TranslationSession.Configuration(source: nil, target: target) }
+                // Auto-detect needs text; the framework cannot identify the language during prepare,
+                // so detect it ourselves from the transcript.
+                let recognizer = NLLanguageRecognizer()
+                recognizer.processString(model.cues.prefix(40).map(\.text).joined(separator: " "))
+                let source = Locale.Language(identifier: recognizer.dominantLanguage?.rawValue ?? "en")
+                let next = TranslationSession.Configuration(source: source, target: target)
+                if config?.target == target, config?.source == source { config?.invalidate() } else { config = next }
             }
             .translationTask(config) { session in
                 await translate(with: session)

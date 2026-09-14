@@ -14,6 +14,9 @@ struct SubtitlesApp: App {
                     if let i = args.firstIndex(of: "--open"), args.count > i + 1 {
                         await model.open(URL(fileURLWithPath: args[i + 1]))
                         if args.contains("--transcribe") { await model.transcribe() }
+                        if let t = args.firstIndex(of: "--translate"), args.count > t + 1 {
+                            model.targetLanguage = Locale.Language(identifier: args[t + 1]); model.translationRequest += 1
+                        }
                         if let e = args.firstIndex(of: "--export-srt"), args.count > e + 1 { model.write(format: .srt, to: URL(fileURLWithPath: args[e + 1])) }
                         if let e = args.firstIndex(of: "--burn"), args.count > e + 1 { await model.burn(to: URL(fileURLWithPath: args[e + 1])) }
                     }
@@ -45,7 +48,7 @@ final class ProjectModel: ObservableObject {
     @Published var error: String?
     @Published var targetLanguage: Locale.Language? = nil
     @Published var translationRequest: Int = 0     // bumps to trigger the SwiftUI translation task
-    @Published var isTranslating = false
+    @Published var isTranslating = false { didSet { fputs("[subtitles] translating=\(isTranslating) translated=\(cues.filter { $0.translation != nil }.count) error=\(error ?? "")\n", stderr) } }
     @Published var player = AVPlayer()
     @Published var currentTime: TimeInterval = 0
     @Published var processingTime: TimeInterval = 0
