@@ -48,13 +48,9 @@ Subtitles does what Submagic, Descript and Captions charge $20 to $30 a month fo
 
 ## Install
 
+Signed with a Developer ID and notarized by Apple, so it opens like any other Mac app.
+
 Download **Subtitles.zip** from the [latest release](https://github.com/Dunebru/subtitles/releases/latest), unzip, move **Subtitles.app** to Applications.
-
-Unsigned app: first launch is **right-click → Open → Open**. If macOS still refuses:
-
-```bash
-xattr -dr com.apple.quarantine /Applications/Subtitles.app
-```
 
 Requires macOS 14 Sonoma or newer on Apple silicon. Translation needs macOS 15.
 
